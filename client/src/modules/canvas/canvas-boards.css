@@ -1,0 +1,321 @@
+/* ======================================================
+   ROOT LAYOUT
+====================================================== */
+
+.canvas-wrapper{
+  display:flex;
+  flex-direction:column;
+  height: 100%;
+  width: 100%;
+  min-height: 0;   /* 🔥 important */
+  min-width: 0;    /* 🔥 important */
+  /*
+  position:relative;
+  height:100%;
+  width:100%;
+  background:#f6f7fb;
+  overflow:hidden;
+  */
+}
+
+/* board stays below UI */
+/* ================= SCROLLABLE BOARD ================= */
+
+.canvas-board{
+  position: relative;
+  flex: 1;
+  overflow: auto;              /* 🔥 enable scroll */
+  background: #f6f7fb;
+  overflow-x: scroll;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+}
+
+
+/* virtual infinite area */
+.canvas-inner{
+  position: relative;
+  min-width: 3000px;           /* 🔥 horizontal space */
+  min-height: 2000px;          /* vertical space */
+}
+
+
+/* ======================================================
+   HEADER
+====================================================== */
+
+.canvas-header{
+  position:relative;
+  z-index:20;
+  height:40px;
+  background:white;
+  border-bottom:1px solid #e5e7eb;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 12px;
+}
+
+
+/* ======================================================
+   TOOLBAR (MUST BE ABOVE BOARD)
+====================================================== */
+
+.canvas-controls-row{
+  position:absolute;
+  top:48px;
+  left:12px;
+  z-index:30;  /* above canvas */
+}
+
+.toolbar{
+  position:relative;
+  z-index:30;
+
+  display:flex;
+  gap:8px;
+
+  background:white;
+  padding:8px;
+  border-radius:12px;
+
+  box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+
+.toolbar button{
+  border:none;
+  background:#eef2ff;
+  padding:6px 10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.toolbar button:hover{
+  background:#4f46e5;
+  color:white;
+}
+
+
+/* ======================================================
+   NODES
+====================================================== */
+
+.canvas-node{
+  position:absolute;
+  background:white;
+  border-radius:12px;
+  padding:10px;
+  box-shadow:0 6px 20px rgba(0,0,0,.12);
+  cursor:grab;
+  z-index:2;
+}
+
+.canvas-node:active{ cursor:grabbing; }
+
+
+.canvas-node:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,.12);
+}
+
+.canvas-node.selected {
+  outline: 2px solid #6366f1;
+}
+
+
+
+.canvas-node textarea{
+  width:100%;
+  height:100%;
+  border:none;
+  resize:none;
+  outline:none;
+  background:transparent;
+}
+
+
+/* =======================================================
+   IMAGE
+
+
+.canvas-node img {
+  max-width: 240px;
+  border-radius: 10px;
+  display: block;
+}
+
+.canvas-node iframe,
+.canvas-node img {
+  pointer-events: none;
+}
+*/
+
+
+/* ======================================================
+   CURSORS
+====================================================== */
+
+.cursor{
+  position:absolute;
+  pointer-events:none;
+  z-index:40;
+}
+
+
+/* ======================================================
+   COMMENT PANEL
+====================================================== */
+
+.comment-dock{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:220px;
+  background:white;
+  border-top:1px solid #e5e7eb;
+  z-index:50;
+  display:flex;
+  flex-direction:column;
+}
+
+
+/* =======================================================
+   COMMENTS PANEL
+======================================================= */
+
+.comment-panel {
+  position: absolute;
+  right: 20px;
+  top: 80px;
+  width: 320px;
+  max-height: 60%;
+  background: white;
+  border-radius: 14px;
+
+  display: flex;
+  flex-direction: column;
+
+  box-shadow:
+    0 4px 12px rgba(0,0,0,.1),
+    0 20px 50px rgba(0,0,0,.15);
+
+  overflow: hidden;
+  z-index: 60;
+}
+
+.comment-header {
+  padding: 12px 14px;
+  font-weight: 700;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+}
+
+.comment-list {
+  padding: 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.comment-item {
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.comment-item b {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.comment-input {
+  border-top: 1px solid #eee;
+  padding: 10px;
+  display: flex;
+  gap: 6px;
+}
+
+.comment-input input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  outline: none;
+}
+
+.comment-input button {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+
+/* ======================================================
+   🚀 UPLOAD MODAL — ALWAYS ON TOP
+====================================================== */
+
+.upload-modal-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  z-index:99999;   /* king of the hill */
+}
+
+.upload-modal{
+  width:420px;
+  max-height:80vh;
+  overflow:auto;
+
+  background:white;
+  border-radius:14px;
+  padding:16px;
+
+  box-shadow:0 25px 80px rgba(0,0,0,.35);
+
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.upload-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.upload-drop{
+  border:2px dashed #c7d2fe;
+  padding:24px;
+  text-align:center;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+.upload-list{
+  font-size:13px;
+  max-height:140px;
+  overflow:auto;
+}
+
+.upload-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+}
+
+.upload-actions .primary{
+  background:#4f46e5;
+  color:white;
+  border:none;
+  padding:6px 12px;
+  border-radius:8px;
+}

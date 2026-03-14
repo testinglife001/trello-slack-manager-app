@@ -1,0 +1,185 @@
+/* ====================== */
+/* Canvas Page Layout */
+/* ====================== */
+.canvas-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: sans-serif;
+  background-color: #f7f7f7;
+}
+
+/* ---------------------- Topbar ---------------------- */
+.canvas-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  height: 50px;
+  border-bottom: 1px solid #ccc;
+  background-color: #fff;
+  z-index: 100;
+}
+
+.canvas-topbar .topbar-left button,
+.canvas-topbar .topbar-right button {
+  cursor: pointer;
+  padding: 4px 8px;
+  margin-right: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #000;
+}
+
+.canvas-topbar .topbar-left button:hover,
+.canvas-topbar .topbar-right button:hover {
+  background-color: #e0e0e0;
+}
+
+/* ---------------------- Workspace ---------------------- */
+.canvas-workspace {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ---------------------- Sidebar ---------------------- */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #ddd;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+}
+
+.sidebar.left {
+  border-right: 1px solid #ddd;
+}
+
+.sidebar.right {
+  border-left: 1px solid #ddd;
+}
+
+.sidebar-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+}
+
+.sidebar-tabs button {
+  flex: 1;
+  padding: 6px 8px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #000;
+  font-weight: normal;
+  transition: 0.2s;
+}
+
+.sidebar-tabs button.active {
+  background-color: #e0e0e0;
+  font-weight: bold;
+}
+
+.sidebar-tabs button:hover {
+  background-color: #f0f0f0;
+}
+
+.sidebar-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  overflow-y: auto;
+}
+
+/* ---------------------- Tool Grid ---------------------- */
+.tool-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tool-grid button {
+  flex: 0 1 48%;
+  padding: 6px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #000;
+}
+
+.tool-grid button.active,
+.tool-grid button:hover {
+  background-color: #e0e0e0;
+  font-weight: bold;
+}
+
+/* ---------------------- Canvas ---------------------- */
+.canvas-wrapper {
+  flex: 1;
+  position: relative;
+  background-color: #fdfdfd;
+  overflow: hidden;
+}
+
+
+
+
+/* ====================== Responsive ====================== */
+@media (max-width: 1200px) {
+  .sidebar.left {
+    width: 220px !important;
+  }
+  .sidebar.right {
+    width: 220px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .sidebar.left,
+  .sidebar.right {
+    position: absolute;
+    top: 50px;
+    bottom: 0;
+    z-index: 50;
+    transition: transform 0.3s ease;
+  }
+  .sidebar.left {
+    transform: translateX(-100%);
+  }
+  .sidebar.left.open {
+    transform: translateX(0);
+  }
+  .sidebar.right {
+    right: 0;
+    transform: translateX(100%);
+  }
+  .sidebar.right.open {
+    transform: translateX(0);
+  }
+  .canvas-wrapper {
+    flex: 1;
+  }
+}
+
+@media (max-width: 600px) {
+  .canvas-topbar .topbar-center {
+    display: none;
+  }
+  .canvas-topbar {
+    padding: 0 5px;
+  }
+  .tool-grid button {
+    flex: 0 1 100%;
+  }
+}
+

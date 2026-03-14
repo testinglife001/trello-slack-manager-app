@@ -1,0 +1,8 @@
+db credentials
+Username
+testinglife001_db_user
+Password
+kQ1Vl2QQTnoej5Jh
+
+mongodb+srv://testinglife001_db_user:kQ1Vl2QQTnoej5Jh@trello-slack-app.vrzysmj.mongodb.net/?appName=trello-slack-app
+

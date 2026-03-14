@@ -1,0 +1,135 @@
+/* ───────────────────────────── */
+/* Layout Root */
+/* ───────────────────────────── */
+
+.canvas-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f4f6f9;
+  overflow: hidden;
+  max-width: 1275px;
+}
+
+/* ───────────────────────────── */
+/* Sticky Header */
+/* ───────────────────────────── */
+
+.canvas-header {
+  position: sticky;
+  top: 0; /* stays under navbar */
+  z-index: 50;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  height: 60px;
+  padding: 0 20px;
+
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.canvas-header h4 {
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ───────────────────────────── */
+/* Body Layout */
+/* ───────────────────────────── */
+
+.canvas-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ───────────────────────────── */
+/* Sidebars */
+/* ───────────────────────────── */
+
+.sidebar {
+  width: 280px;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.25s ease;
+  overflow: hidden;
+}
+
+.sidebar.closed {
+  width: 0 !important;
+}
+
+.resize-handle {
+  width: 5px;
+  cursor: col-resize;
+  background: transparent;
+}
+
+.resize-handle:hover {
+  background: rgba(0,0,0,0.1);
+}
+
+.sidebar.right {
+  border-right: none;
+  border-left: 1px solid #e5e7eb;
+}
+
+/* Tabs */
+
+.sidebar-tabs {
+  display: flex;
+  border-bottom: 1px solid #eee;
+ 
+}
+
+.sidebar-tabs button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+   background: darkgray;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.sidebar-tabs button.active {
+  background: #eef2ff;
+  font-weight: 600;
+  color: #4f46e5;
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+/* ───────────────────────────── */
+/* Canvas Area */
+/* ───────────────────────────── */
+
+.canvas-wrapper {
+  flex: 1;
+  position: relative;
+  background: #ffffff;
+}
+
+.fabric-canvas {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #ddd;
+}
+
+.canvas-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+}

@@ -1,0 +1,99 @@
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  user-select: none;
+  margin: 5px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+
+  transition:
+    transform 180ms cubic-bezier(.2,.8,.2,1),
+    box-shadow 120ms ease,
+    opacity 120ms ease;
+}
+
+/* hover lift */
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.12);
+}
+
+/* multi select */
+.card.selected {
+  outline: 2px solid #4c9ffe;
+}
+
+/* during drag 
+.card.dragging {
+  opacity: 0.25;
+  transform: scale(0.98);
+}
+*/
+
+/* drop impact 
+.card.landing {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
+*/
+
+/* title */
+.card-title {
+  font-weight: 500;
+  color: black;
+}
+
+/* due date */
+.due {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #666;
+}
+
+.overdue {
+  color: #ff4d4f;
+  font-weight: 600;
+}
+
+/* counters */
+.progress,
+.attach {
+  margin-top: 4px;
+  font-size: 12px;
+  opacity: .7;
+}
+
+/* priority colors */
+.priority-high { border-left: 4px solid #ff4d4f; }
+.priority-normal { border-left: 4px solid #4096ff; }
+.priority-low { border-left: 4px solid #52c41a; }
+
+
+.drop-placeholder {
+  height: 70px;
+  margin: 6px 0;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.06);
+  border: 2px dashed rgba(0, 0, 0, 0.15);
+}
+
+.card.ghost {
+  opacity: 0.5;
+  transform: scale(0.97);
+}
+
+.card.dragging {
+  z-index: 1000;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  transform: rotate(1deg);
+}
+
+.card.landing {
+  animation: land 160ms ease;
+}
+
+@keyframes land {
+  0% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+

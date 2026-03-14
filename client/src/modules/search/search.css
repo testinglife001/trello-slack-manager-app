@@ -1,0 +1,28 @@
+.search-modal {
+  width: 600px;
+}
+
+.search-results {
+  margin-top: 12px;
+  max-height: 400px;
+  overflow: auto;
+}
+
+.search-item {
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.search-item:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.search-title {
+  font-weight: 600;
+}
+
+.search-type {
+  font-size: 12px;
+  opacity: 0.6;
+}

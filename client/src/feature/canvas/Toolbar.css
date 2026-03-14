@@ -1,0 +1,23 @@
+.toolbar{
+  position:absolute;
+  top:10px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#111827;
+  padding:8px;
+  border-radius:10px;
+  display:flex;
+  gap:6px;
+}
+
+.toolbar button{
+  background:#1f2937;
+  color:white;
+  border:none;
+  padding:6px 10px;
+  cursor:pointer;
+}
+
+.toolbar button.active{
+  background:#2563eb;
+}

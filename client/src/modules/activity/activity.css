@@ -1,0 +1,29 @@
+.activity-panel {
+  padding: 12px;
+  overflow: auto;
+}
+
+.activity-item {
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.activity-item:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.activity-line {
+  display: flex;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.activity-type {
+  opacity: 0.7;
+}
+
+.activity-time {
+  font-size: 12px;
+  opacity: 0.5;
+}

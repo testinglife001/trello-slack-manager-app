@@ -1,0 +1,21 @@
+.presence-bar {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.presence-user {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.presence-user img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+}

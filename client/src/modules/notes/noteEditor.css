@@ -1,0 +1,50 @@
+.note-editor-page {
+  width: 100%;
+  min-width: 999px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.note-editor-header {
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.note-title-input {
+  flex: 1;
+  font-size: 22px;
+  font-weight: 600;
+  border: none;
+  outline: none;
+}
+
+.version {
+  font-size: 13px;
+  color: #888;
+}
+
+.note-meta-panel {
+  display: flex;
+  gap: 20px;
+  padding: 15px 40px;
+  border-bottom: 1px solid #eee;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.editor-holder {
+  flex: 1;
+  padding: 40px 120px;
+  overflow-y: auto;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.note-loading {
+  padding: 50px;
+}

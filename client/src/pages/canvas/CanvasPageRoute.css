@@ -1,0 +1,32 @@
+.app-layout{
+ display:flex;
+ height:100vh;
+}
+
+.sidebar{
+ width:240px;
+ background:#111827;
+ color:white;
+ padding:12px;
+}
+
+.workspace{
+ flex:1;
+ position:relative;
+ background:#0f172a;
+}
+
+.floating-layer{
+ position:absolute;
+ inset:0;
+ pointer-events:none;
+}
+
+.note{
+ position:absolute;
+ background:#fff8c5;
+ padding:10px;
+ border-radius:8px;
+ cursor:move;
+ pointer-events:auto;
+}

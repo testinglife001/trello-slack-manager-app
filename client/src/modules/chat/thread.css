@@ -1,0 +1,31 @@
+.thread-panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width:320px;
+  height: 100%;
+  background: white;
+  border-left: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  animation:slide .25s ease;
+}
+
+
+
+@keyframes slide {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.thread-header {
+  padding: 10px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.thread-root {
+  padding: 10px;
+  border-bottom: 1px solid #e2e8f0;
+}

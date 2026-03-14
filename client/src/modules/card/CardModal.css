@@ -1,0 +1,57 @@
+.card-modal {
+  width: 880px;
+  max-height: 85vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* title */
+.card-modal h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* header row */
+.card-header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* section */
+.card-modal h3 {
+  font-size: 14px;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #444;
+}
+
+/* blocks */
+.card-modal > div {
+  background: #fafafa;
+  border-radius: 10px;
+  padding: 12px;
+  border: 1px solid #eee;
+}
+
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tabs button {
+  background: silver;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.tabs button.active {
+  background: #2563eb;
+  color: white;
+}

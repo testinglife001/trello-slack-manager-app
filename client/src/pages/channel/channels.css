@@ -1,0 +1,40 @@
+/* whole screen */
+.project-workspace {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+  min-width: 1100px;
+}
+
+/* ================= CHAT ================= */
+.chat-column {
+  width: 720px;            /* Slack default */
+  min-width: 420px;
+  max-width: 700px;
+
+  display: flex;
+  flex-direction: column;
+
+  border-right: 1px solid #e5e7eb;
+  background: white;
+}
+
+/* message scroll */
+.chat-column .message-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* ================= CANVAS ================= */
+.canvas-column {
+  flex: 1;
+  position: relative;
+  background: #f8fafc;
+
+}
+
+/* thread floats above */
+.thread-panel {
+  width: 380px;
+  border-left: 1px solid #e5e7eb;
+}

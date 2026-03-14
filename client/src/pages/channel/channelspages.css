@@ -1,0 +1,103 @@
+/* PAGE ROOT */
+.channel-page {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: white;
+}
+
+/* ================= CHAT ================= */
+
+.chat-column {
+  flex: 1;                 /* take remaining width */
+  min-width: 0;            /* IMPORTANT for flex overflow */
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+/* header should touch navbar 
+.channel-header {
+  flex-shrink: 0;
+}
+*/
+
+/* messages fill rest */
+.message-list {
+  flex: 1;
+  overflow: auto;
+}
+
+/* ================= DIVIDER ================= */
+
+.resize-divider {
+  width: 5px;
+  cursor: col-resize;
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.resize-divider:hover {
+  background: #cbd5f5;
+}
+
+/* ================= CANVAS ================= */
+
+.canvas-column {
+  flex-shrink: 0;
+  min-width: 0;
+  border-left: 1px solid #e5e7eb;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  transition: width 200ms ease;
+}
+
+.canvas-column.closed {
+  border-left: none;
+}
+
+/* ================= TOP BAR ================= */
+.canvas-topbar {
+  height: 38px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 0 ;
+}
+
+/* ================= PIP ================= */
+.canvas-pip {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 360px;
+  height: 260px;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* ================= THREAD ================= */
+
+.thread-panel {
+  width: 380px;
+  border-left: 1px solid #e5e7eb;
+}
+
+.channel-wrapper{
+ display:flex;
+ height:100%;
+}
+
+.channel-main{
+ flex:1;
+ display:flex;
+ flex-direction:column;
+}

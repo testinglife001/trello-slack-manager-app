@@ -1,0 +1,235 @@
+/* ============================= */
+/* ROOT CONTAINER */
+/* ============================= */
+
+.create-note-container {
+  width: 100%;
+  width: 999px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f7f9fc;
+  overflow: scroll;
+}
+
+/* ============================= */
+/* STICKY HEADER */
+/* ============================= */
+
+.create-note-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: white;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: box-shadow 0.3s ease;
+}
+
+.create-note-header.scrolled {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.collapse-btn {
+  background: green;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.primary-btn {
+  padding: 10px 22px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ============================= */
+/* SPLIT WRAPPER */
+/* ============================= */
+
+.split-wrapper {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* ============================= */
+/* LEFT PANEL */
+/* ============================= */
+
+/* ============================= */
+/* LEFT PANEL */
+/* ============================= */
+
+.left-panel {
+  width: 380px;
+  min-width: 250px;
+  max-width: 600px;
+  background: white;
+  padding: 25px;
+  margin-left: 1%;
+  overflow-y: auto;        /* individual scroll */
+  overflow-x: hidden;
+
+  border-right: 1px solid #eee;
+}
+
+.left-panel.collapsed {
+  width: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* ============================= */
+/* RESIZER */
+/* ============================= */
+
+.resizer {
+  width: 5px;
+  cursor: col-resize;
+  background: transparent;
+}
+
+.resizer:hover {
+  background: #d1d5db;
+}
+
+
+/* ============================= */
+/* RIGHT PANEL */
+/* ============================= */
+
+.right-panel {
+  flex: 1;
+  background: #fafafa;
+  padding: 40px;
+
+  overflow-y: auto;        /* individual scroll */
+  overflow-x: hidden;
+
+  min-height: 0;           /* CRITICAL */
+}
+
+
+/* ============================= */
+/* SCROLLBAR STYLING */
+/* ============================= */
+
+.left-panel::-webkit-scrollbar,
+.right-panel::-webkit-scrollbar,
+.user-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.left-panel::-webkit-scrollbar-thumb,
+.right-panel::-webkit-scrollbar-thumb,
+.user-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.left-panel::-webkit-scrollbar-thumb:hover,
+.right-panel::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* ============================= */
+/* FIELDS */
+/* ============================= */
+
+.field {
+  margin-bottom: 20px;
+}
+
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.field-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+}
+
+/* ============================= */
+/* USER LIST */
+/* ============================= */
+
+.user-list {
+  max-height: 180px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.user-item {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+/* ============================= */
+/* ADVANCED */
+/* ============================= */
+
+.advanced-section {
+  margin-top: 30px;
+}
+
+.advanced-section h3 {
+  font-size: 15px;
+  margin-bottom: 15px;
+}
+
+.advanced-section input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+/* ============================= */
+/* EDITOR */
+/* ============================= */
+
+.editor-label {
+  font-weight: 800;
+  font-size: 14px;
+  margin-bottom: 10px;
+  display: block;
+  color: black;
+}
+
+/* ============================= */ /* EDITOR */ /* ============================= */ 
+.editor-holder { 
+  min-height: 700px; 
+  background: white; 
+  padding: 30px; 
+  border-radius: 12px; 
+}

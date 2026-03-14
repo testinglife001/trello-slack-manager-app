@@ -1,0 +1,108 @@
+/* ===============================
+   LAYOUT
+================================= */
+
+.project-modal{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+
+/* ===============================
+   HEADER
+================================= */
+
+.pm-header h2{
+  margin:0;
+  font-size:20px;
+}
+
+.pm-header p{
+  margin:4px 0 0;
+  font-size:13px;
+  color:#64748b;
+}
+
+/* ===============================
+   BODY
+================================= */
+
+.pm-body{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.pm-body label{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:13px;
+  font-weight:600;
+  color:#334155;
+}
+
+/* inputs */
+.pm-body input,
+.pm-body textarea,
+.pm-body select{
+  font-family:inherit;
+  font-size:14px;
+
+  border:1px solid #e2e8f0;
+  border-radius:10px;
+
+  padding:10px 12px;
+  outline:none;
+
+  transition:border .15s, box-shadow .15s;
+}
+
+/* focus */
+.pm-body input:focus,
+.pm-body textarea:focus,
+.pm-body select:focus{
+  border-color:#6366f1;
+  box-shadow:0 0 0 3px rgba(99,102,241,.15);
+}
+
+/* ===============================
+   FOOTER
+================================= */
+
+.pm-footer{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:4px;
+}
+
+/* buttons */
+.pm-footer button{
+  border:none;
+  border-radius:10px;
+  padding:10px 14px;
+  font-weight:600;
+  font-size:13px;
+  cursor:pointer;
+}
+
+/* ghost */
+.pm-footer .ghost{
+  background:#f1f5f9;
+  color:#334155;
+}
+
+.pm-footer .ghost:hover{
+  background:#e2e8f0;
+}
+
+/* primary */
+.pm-footer .primary{
+  background:#4f46e5;
+  color:white;
+}
+
+.pm-footer .primary:hover{
+  background:#4338ca;
+}

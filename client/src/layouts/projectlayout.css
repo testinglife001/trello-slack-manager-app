@@ -1,0 +1,65 @@
+/* Whole screen */
+.project-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+/* ================= BODY ================= */
+.project-body {
+  display: flex;
+  flex: 1;
+  min-height: 0; /* Critical for inner scrolling */
+  overflow: hidden;
+}
+
+/* ================= WORKSPACE ================= */
+.project-workspace {
+  flex: 1;
+  display: flex;
+  min-width: 0; /* Important for flex children scrolling */
+  background: #fcfcfd;
+  position: relative;
+}
+
+/* ================= CANVAS ================= */
+.layout-canvas {
+  width: 520px;
+  border-left: 1px solid #f3f4f6;
+  background: #ffffff;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 30px rgba(0,0,0,0.02);
+  z-index: 10;
+}
+
+/* Custom Scrollbar for the whole app */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
+}
+
+/* Utilities */
+.sidebar-link {
+  transition: all 0.2s ease-in-out;
+}
+
+.sidebar-link.active {
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1), 0 4px 6px -2px rgba(37, 99, 235, 0.05);
+}

@@ -1,0 +1,531 @@
+/* =======================================================
+   FOUNDATION
+======================================================= */
+
+.canvas-wrapper {
+  flex: 1;
+  position: relative;
+  background: #f6f7fb;
+  overflow: hidden;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+}
+
+.canvas-board {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.canvas-inner {
+  position: absolute;
+  inset: 0;
+}
+
+/* =======================================================
+   TOOLBAR
+======================================================= */
+
+.canvas-toolbar {
+  /*
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  */
+  z-index: 50;
+
+  display: flex;
+  gap: 6px;
+
+  background: white;
+  padding: 6px;
+  border-radius: 12px;
+
+  box-shadow:
+    0 2px 6px rgba(0,0,0,.08),
+    0 10px 30px rgba(0,0,0,.12);
+}
+
+.canvas-toolbar button {
+  border: none;
+  background: #eef2ff;
+  color: #3730a3;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.canvas-toolbar button:hover {
+  background: #4f46e5;
+  color: white;
+}
+
+/* =======================================================
+   NODE BASE
+======================================================= */
+
+.canvas-node {
+  position: absolute;
+  background: white;
+  border-radius: 14px;
+  min-width: 180px;
+  min-height: 110px;
+  padding: 12px;
+
+  box-shadow:
+    0 1px 3px rgba(0,0,0,0.06),
+    0 10px 25px rgba(0,0,0,0.08);
+
+  transition: transform .1s ease, box-shadow .15s ease;
+  cursor: grab;
+}
+
+.canvas-node:active {
+  cursor: grabbing;
+}
+
+.canvas-node:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,.12);
+}
+
+.canvas-node.selected {
+  outline: 2px solid #6366f1;
+}
+
+/* =======================================================
+   NODE TYPES
+======================================================= */
+
+/* Sticky note */
+.canvas-node.note {
+  background: #fff9c4;
+}
+
+/* Text */
+.canvas-node.text {
+  background: white;
+}
+
+/* Image */
+.canvas-node.image {
+  padding: 6px;
+}
+
+/* Video */
+.canvas-node.video iframe {
+  border-radius: 10px;
+}
+
+/* Document */
+.canvas-node.document {
+  background: #f1f5f9;
+  font-weight: 600;
+}
+
+
+
+/* ======================================================
+   NODES
+====================================================== */
+
+.canvas-node{
+  position:absolute;
+  background:white;
+  border-radius:12px;
+  padding:10px;
+  box-shadow:0 6px 20px rgba(0,0,0,.12);
+  cursor:grab;
+  z-index:2;
+}
+
+.canvas-node:active{ cursor:grabbing; }
+
+
+.canvas-node:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,.12);
+}
+
+.canvas-node.selected {
+  outline: 2px solid #6366f1;
+}
+
+/*
+.canvas-node textarea{
+  width:100%;
+  height:100%;
+  border:none;
+  resize:none;
+  outline:none;
+  background:transparent;
+}
+*/
+
+
+/* =======================================================
+   IMAGE
+======================================================= */
+
+.canvas-node img {
+  max-width: 240px;
+  border-radius: 10px;
+  display: block;
+}
+
+.canvas-node iframe,
+.canvas-node img {
+  pointer-events: none;
+}
+
+
+/* =======================================================
+   TEXTAREA (notes)
+======================================================= */
+
+.canvas-node textarea {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  resize: none;
+  outline: none;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+/* =======================================================
+   IMAGE
+======================================================= */
+
+.canvas-node img {
+  max-width: 240px;
+  border-radius: 10px;
+  display: block;
+}
+
+.canvas-node iframe,
+.canvas-node img {
+  pointer-events: none;
+}
+
+
+/* =======================================================
+   COMMENT DOT
+======================================================= */
+
+.comment-dot {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ef4444;
+  color: white;
+  font-size: 11px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(0,0,0,.2);
+}
+
+/* =======================================================
+   SELECTION USERS
+======================================================= */
+
+.selection-layer {
+  position: absolute;
+  bottom: -18px;
+  left: 0;
+  font-size: 10px;
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+/* =======================================================
+   CURSORS
+======================================================= */
+
+.cursor {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: #111827;
+  color: white;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 100;
+  box-shadow: 0 4px 10px rgba(0,0,0,.2);
+}
+
+/* =======================================================
+   COMMENTS PANEL
+======================================================= */
+
+.comment-panel {
+  position: absolute;
+  right: 20px;
+  top: 80px;
+  width: 320px;
+  max-height: 60%;
+  background: white;
+  border-radius: 14px;
+
+  display: flex;
+  flex-direction: column;
+
+  box-shadow:
+    0 4px 12px rgba(0,0,0,.1),
+    0 20px 50px rgba(0,0,0,.15);
+
+  overflow: hidden;
+  z-index: 60;
+}
+
+.comment-header {
+  padding: 12px 14px;
+  font-weight: 700;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+}
+
+.comment-list {
+  padding: 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.comment-item {
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.comment-item b {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.comment-input {
+  border-top: 1px solid #eee;
+  padding: 10px;
+  display: flex;
+  gap: 6px;
+}
+
+.comment-input input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  outline: none;
+}
+
+.comment-input button {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+/* =======================================================
+   CONTROLS ROW
+======================================================= */
+
+.canvas-topbar {
+  padding-right: 10px;
+  border-right: 1px solid #eee;
+}
+
+
+.canvas-controls {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+
+  z-index: 40;
+}
+
+/* topbar section */
+.canvas-topbar {
+  display: flex;
+  gap: 6px;
+}
+
+/* toolbar section */
+.canvas-toolbar {
+  display: flex;
+  gap: 6px;
+}
+
+/* buttons */
+.canvas-topbar button,
+.canvas-toolbar button {
+  border: none;
+  background: #eef2ff;
+  color: #3730a3;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+
+.canvas-topbar button:hover,
+.canvas-toolbar button:hover {
+  background: #4f46e5;
+  color: white;
+}
+
+
+.canvas-header{
+  height:40px;
+  background:white;
+  border-bottom:1px solid #e5e7eb;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 12px;
+  z-index:50;
+}
+
+.avatars{display:flex;gap:6px;}
+.avatar{
+  width:26px;height:26px;border-radius:50%;
+  background:#6366f1;color:white;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;
+}
+
+.canvas-controls-row{
+  position:absolute;
+  top:48px;
+  left:12px;
+  z-index:60;
+}
+
+.toolbar{
+  display:flex;
+  gap:10px;
+  background:white;
+  padding:6px;
+  border-radius:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,.12);
+}
+
+.group{display:flex;gap:4px;border-right:1px solid #eee;padding-right:8px;}
+.group:last-child{border-right:none;}
+
+.tool{
+  border:none;
+  background:#eef2ff;
+  padding:6px 10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.comment-dock{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:220px;
+  background:white;
+  border-top:1px solid #e5e7eb;
+  z-index:200;
+  display:flex;
+  flex-direction:column;
+}
+
+.canvas-node iframe{ pointer-events:none; }
+
+.canvas-node.image img {
+  width: 220px;
+  height: auto;
+  border-radius: 10px;
+  display: block;
+}
+
+.canvas-node.video iframe {
+  width: 260px;
+  height: 160px;
+  border-radius: 10px;
+}
+
+.empty-node {
+  padding: 20px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+.text-node {
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+.upload-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;   /* VERY IMPORTANT */
+}
+
+
+.upload-modal {
+  width: 420px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.upload-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.upload-drop {
+  border: 2px dashed #c7d2fe;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.upload-list {
+  max-height: 120px;
+  overflow: auto;
+  font-size: 13px;
+}
+
+.upload-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.upload-actions .primary {
+  background: #4f46e5;
+  color: white;
+}
+
+
+
