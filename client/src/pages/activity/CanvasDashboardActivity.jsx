@@ -1,5 +1,4 @@
-// CanvasDashboardActivity.jsx
-import { useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSocket } from "../../context/SocketContext";
 import { request } from "../../api/client";
 
@@ -12,134 +11,188 @@ import MentionHighlights from "./MentionHighlights";
 
 import "./CanvasActivity.css";
 
+const EMPTY_SNAPSHOT = { nodes: [] };
+
 export default function CanvasDashboardActivity({
   projectId,
   channelId,
-  userId
+  userId,
 }) {
   const socket = useSocket();
 
   const [activities, setActivities] = useState([]);
   const [canvasActivities, setCanvasActivities] = useState([]);
   const [versions, setVersions] = useState([]);
-  const [baseSnapshot, setBaseSnapshot] = useState({ nodes: [] });
+  const [baseSnapshot, setBaseSnapshot] = useState(EMPTY_SNAPSHOT);
   const [replayOperations, setReplayOperations] = useState([]);
   const [liveOperations, setLiveOperations] = useState([]);
   const [selectedVersion, setSelectedVersion] = useState(null);
   const [mentions, setMentions] = useState([]);
   const [actors, setActors] = useState([]);
   const [speed, setSpeed] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // ---------------- INITIAL LOAD ----------------
   useEffect(() => {
+    let active = true;
+
     async function load() {
+      if (!projectId) {
+        if (active) {
+          setActivities([]);
+          setVersions([]);
+          setBaseSnapshot(EMPTY_SNAPSHOT);
+          setReplayOperations([]);
+          setCanvasActivities([]);
+          setLoading(false);
+        }
+        return;
+      }
+
+      setLoading(true);
+      setError("");
+
       try {
-        const fetches = [request(`/activity/project/${projectId}`)];
-        
-        if (channelId) {
-          fetches.push(request(`/canvas-history/${channelId}`));
-          fetches.push(request(`/canvas-playback/${channelId}`));
-          fetches.push(request(`/mycanvas/room/${channelId}`));
+        const activityPromise = request(`/activity/project/${projectId}?limit=50`);
+
+        if (!channelId) {
+          const activityOnly = await activityPromise;
+          if (!active) return;
+          setActivities(Array.isArray(activityOnly) ? activityOnly : []);
+          setVersions([]);
+          setBaseSnapshot(EMPTY_SNAPSHOT);
+          setReplayOperations([]);
+          setCanvasActivities([]);
+          return;
         }
 
-        const [act, ver, playback, roomData] = await Promise.all(fetches);
+        const [act, ver, playback, roomData] = await Promise.all([
+          activityPromise,
+          request(`/canvas-history/${channelId}`),
+          request(`/canvas-playback/${channelId}`),
+          request(`/mycanvas/room/${channelId}`),
+        ]);
 
-        setActivities(act || []);
-        
-        if (channelId) {
-          setVersions(ver || []);
-          setBaseSnapshot(playback?.snapshot || { nodes: [] });
-          setReplayOperations(playback?.operations || []);
+        if (!active) return;
 
-          if (roomData?._id) {
-            const canvasAct = await request(`/mycanvas/activity/${roomData._id}`);
-            setCanvasActivities(canvasAct || []);
-          }
+        setActivities(Array.isArray(act) ? act : []);
+        setVersions(Array.isArray(ver) ? ver : []);
+        setBaseSnapshot(playback?.snapshot || EMPTY_SNAPSHOT);
+        setReplayOperations(Array.isArray(playback?.operations) ? playback.operations : []);
+
+        if (roomData?._id) {
+          const canvasAct = await request(`/mycanvas/activity/${roomData._id}`);
+          if (!active) return;
+          setCanvasActivities(Array.isArray(canvasAct) ? canvasAct : []);
+        } else {
+          setCanvasActivities([]);
         }
       } catch (err) {
-        console.error("Failed to load dashboard data:", err);
+        if (active) {
+          console.error("Failed to load dashboard data:", err);
+          setError("Could not load activity dashboard data.");
+        }
+      } finally {
+        if (active) setLoading(false);
       }
     }
 
-    if (projectId) {
-      load();
-    }
+    load();
+    return () => {
+      active = false;
+    };
   }, [projectId, channelId]);
 
-  // ---------------- SOCKET SETUP ----------------
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !projectId) return;
 
-    socket.emit("join-user", userId);
+    if (userId) socket.emit("join-user", userId);
     socket.emit("join-project", projectId);
     if (channelId) socket.emit("join-channel", channelId);
 
-    socket.on("canvas:update", ({ op, actor }) => {
-      setLiveOperations(prev => [...prev, op]);
+    const onCanvasUpdate = ({ op, actor }) => {
+      if (!op) return;
+
+      setLiveOperations((prev) => [...prev.slice(-199), op]);
 
       const id = actor?._id || actor?.id;
-      if (id) {
-        setActors(prev => [
-          ...prev.filter(a => a.id !== id),
-          {
-            id,
-            name: actor.name,
-            color: actor.color || "#4caf50",
-            x: op.payload?.x,
-            y: op.payload?.y
-          }
-        ]);
-      }
-    });
+      if (!id) return;
 
-    socket.on("mention", mention => {
-      setMentions(prev => [mention, ...prev]);
-    });
+      setActors((prev) => [
+        ...prev.filter((a) => a.id !== id),
+        {
+          id,
+          name: actor.name || "User",
+          color: actor.color || "#4caf50",
+          x: op.payload?.x,
+          y: op.payload?.y,
+        },
+      ]);
+    };
 
-    socket.on("activity:new", activity => {
-      setActivities(prev => [activity, ...prev]);
-    });
+    const onMention = (mention) => {
+      setMentions((prev) => [mention, ...prev].slice(0, 50));
+    };
+
+    const onActivity = (activity) => {
+      setActivities((prev) => [activity, ...prev].slice(0, 100));
+    };
+
+    socket.on("canvas:update", onCanvasUpdate);
+    socket.on("mention", onMention);
+    socket.on("activity:new", onActivity);
 
     return () => {
-      socket.off("canvas:update");
-      socket.off("mention");
-      socket.off("activity:new");
+      socket.off("canvas:update", onCanvasUpdate);
+      socket.off("mention", onMention);
+      socket.off("activity:new", onActivity);
     };
   }, [socket, projectId, channelId, userId]);
 
-  // ---------------- VERSION SELECT ----------------
-  const handleVersionSelect = async version => {
-    if (!channelId) return;
-    setSelectedVersion(version);
+  const handleVersionSelect = useCallback(
+    async (version) => {
+      if (!channelId || !version) return;
+      setSelectedVersion(version);
 
-    try {
-      const res = await request(
-        `/canvas-playback/${channelId}?fromVersion=${version.version}`
-      );
+      try {
+        const res = await request(
+          `/canvas-playback/${channelId}?fromVersion=${version.version}`
+        );
 
-      if (res) {
-        setBaseSnapshot(res.snapshot || { nodes: [] });
-        setReplayOperations(res.operations || []);
-        setLiveOperations([]);
+        if (res) {
+          setBaseSnapshot(res.snapshot || EMPTY_SNAPSHOT);
+          setReplayOperations(Array.isArray(res.operations) ? res.operations : []);
+          setLiveOperations([]);
+        }
+      } catch (err) {
+        console.error("Failed to load version playback:", err);
       }
-    } catch (err) {
-      console.error("Failed to load version playback:", err);
-    }
-  };
+    },
+    [channelId]
+  );
+
+  const replayStream = useMemo(
+    () => [...replayOperations, ...liveOperations],
+    [replayOperations, liveOperations]
+  );
+
+  if (loading) {
+    return <div className="canvas-dashboard-state">Loading activity dashboard…</div>;
+  }
 
   return (
     <div className="canvas-dashboard-grid">
-      {/* LEFT: ACTIVITY FEED */}
       <div className="dashboard-left">
         <h3>{channelId ? "Channel Activity" : "Project Activity"}</h3>
+        {error && <div className="dashboard-error">{error}</div>}
         <ActivityFeed activities={activities} />
-        
+
         {canvasActivities.length > 0 && (
           <div className="canvas-specific-activity">
             <h3>Canvas Engine Logs</h3>
-            {canvasActivities.map(a => (
+            {canvasActivities.map((a) => (
               <div key={a._id} className="activity-item">
-                <strong>{a.user?.username}</strong> {a.action}
+                <strong>{a.user?.username || a.user?.name || "User"}</strong> {a.action}
                 <div className="activity-time">{new Date(a.createdAt).toLocaleString()}</div>
               </div>
             ))}
@@ -147,7 +200,6 @@ export default function CanvasDashboardActivity({
         )}
       </div>
 
-      {/* CENTER: TIMELINE & REPLAY (Only if channelId provided) */}
       {channelId && (
         <div className="dashboard-center">
           <VersionScrubber
@@ -157,25 +209,35 @@ export default function CanvasDashboardActivity({
           />
 
           <div className="cinematic-stage">
-            <CinematicReplay
-              base={baseSnapshot}
-              operations={[...replayOperations, ...liveOperations]}
-              speed={speed}
-            />
+            <CinematicReplay base={baseSnapshot} operations={replayStream} speed={speed} />
 
             <LiveCursors actors={actors} />
             <MentionHighlights mentions={mentions} />
 
             <div className="speed-controls">
-              <button onClick={() => setSpeed(0.5)}>0.5x</button>
-              <button onClick={() => setSpeed(1)}>1x</button>
-              <button onClick={() => setSpeed(2)}>2x</button>
+              <button
+                className={speed === 0.5 ? "active" : ""}
+                onClick={() => setSpeed(0.5)}
+              >
+                0.5x
+              </button>
+              <button
+                className={speed === 1 ? "active" : ""}
+                onClick={() => setSpeed(1)}
+              >
+                1x
+              </button>
+              <button
+                className={speed === 2 ? "active" : ""}
+                onClick={() => setSpeed(2)}
+              >
+                2x
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* RIGHT: NOTIFICATIONS */}
       <div className="dashboard-right">
         <h3>Mentions & Alerts</h3>
         <NotificationsPanel mentions={mentions} />

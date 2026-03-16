@@ -1,180 +1,521 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import KanbanView from "../../clone/KanbanView";
-import ChannelHeader from "../../modules/chat/ChannelHeader";
-import MessageList from "../../modules/chat/MessageList";
-import MessageInput from "../../modules/chat/MessageInput";
-import TypingIndicator from "../../modules/chat/TypingIndicator";
-import ThreadPanel from "../../modules/chat/ThreadPanel";
-import { 
-  Layout, 
-  MessageSquare, 
-  Settings, 
-  Users, 
-  Megaphone,
-  Share2,
-  BarChart2,
+import {
   Calendar as CalendarIcon,
-  PanelRightClose,
-  PanelRightOpen
-} from 'lucide-react';
-
+  CheckCircle2,
+  MessageSquare,
+  Megaphone,
+  Plus,
+  Send,
+} from "lucide-react";
+import { useProject } from "../../context/ProjectContext";
+import { socialMediaApi } from "../../api/socialMediaApi";
+import SocialPostEditor from "./SocialPostEditor";
+import SocialHeaderStats from "./components/SocialHeaderStats";
+import FutureLabPanel from "./components/FutureLabPanel";
 import "./SocialMediaManager.css";
 
-const SocialMediaManager = () => {
-  const { channelId = "social-media-discussion" } = useParams();
-  const [threadMsg, setThreadMsg] = useState(null);
-  const [activeTab, setActiveTab] = useState("tasks"); // 'tasks' or 'analytics'
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [discussionOpen, setDiscussionOpen] = useState(true);
+const PLATFORMS = ["facebook", "instagram", "x", "linkedin", "youtube", "tiktok"];
+const TASK_COLUMNS = ["todo", "in_progress", "review", "done"];
+
+export default function SocialMediaManager() {
+  const { projectId } = useProject();
+  const { channelId } = useParams();
+
+  const [tab, setTab] = useState("tasks");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [posts, setPosts] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const [discussions, setDiscussions] = useState([]);
+
+  const [newPost, setNewPost] = useState({
+    title: "",
+    caption: "",
+    contentHtml: "",
+    contentType: "text",
+    platforms: ["instagram"],
+    scheduledAt: "",
+  });
+  const [postMedia, setPostMedia] = useState([]);
+  const [newTask, setNewTask] = useState({ title: "", description: "", status: "todo" });
+  const [message, setMessage] = useState("");
+  const [selectedPostId, setSelectedPostId] = useState("");
+  const [noteText, setNoteText] = useState("");
+
+  const loadOverview = async () => {
+    if (!projectId) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const data = await socialMediaApi.overview(projectId, channelId);
+      setPosts(Array.isArray(data?.posts) ? data.posts : []);
+      setTasks(Array.isArray(data?.tasks) ? data.tasks : []);
+      setDiscussions(Array.isArray(data?.discussions) ? data.discussions : []);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load social media manager data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadOverview();
+  }, [projectId, channelId]);
+
+  const tasksByStatus = useMemo(() => {
+    const grouped = { todo: [], in_progress: [], review: [], done: [] };
+    for (const t of tasks) {
+      if (grouped[t.status]) grouped[t.status].push(t);
+    }
+    return grouped;
+  }, [tasks]);
+
+  const scheduledPosts = useMemo(
+    () => posts.filter((p) => p.scheduledAt).sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt)),
+    [posts]
+  );
+
+  const selectedPost = useMemo(
+    () => posts.find((p) => String(p._id) === String(selectedPostId)) || null,
+    [posts, selectedPostId]
+  );
+
+  const stats = useMemo(() => {
+    const openTasks = tasks.filter((t) => t.status !== "done").length;
+    const scheduledPostsCount = posts.filter((p) => p.status === "scheduled").length;
+    const publishedPosts = posts.filter((p) => p.status === "published").length;
+
+    return {
+      openTasks,
+      scheduledPosts: scheduledPostsCount,
+      publishedPosts,
+      discussions: discussions.length,
+    };
+  }, [tasks, posts, discussions]);
+
+
+  const runWithRollback = async ({
+    applyOptimistic,
+    rollback,
+    mutation,
+    onSuccess,
+    errorMessage,
+  }) => {
+    applyOptimistic?.();
+    try {
+      const result = await mutation();
+      onSuccess?.(result);
+    } catch (err) {
+      console.error(err);
+      rollback?.();
+      setError(errorMessage || "Action failed.");
+    }
+  };
+
+  const createPost = async (e) => {
+    e.preventDefault();
+    if (!newPost.title.trim()) return;
+
+    const created = await socialMediaApi.createPost(projectId, {
+      ...newPost,
+      channel: channelId || null,
+      scheduledAt: newPost.scheduledAt || null,
+      media: postMedia,
+    });
+
+    setPosts((prev) => [created, ...prev]);
+    setNewPost({
+      title: "",
+      caption: "",
+      contentHtml: "",
+      contentType: "text",
+      platforms: ["instagram"],
+      scheduledAt: "",
+    });
+    setPostMedia([]);
+  };
+
+  const createTask = async (e) => {
+    e.preventDefault();
+    if (!newTask.title.trim()) return;
+
+    const created = await socialMediaApi.createTask(projectId, {
+      ...newTask,
+      channel: channelId || null,
+      socialPost: selectedPostId || null,
+    });
+
+    setTasks((prev) => [created, ...prev]);
+    setNewTask({ title: "", description: "", status: "todo" });
+  };
+
+  const moveTask = async (task, status) => {
+    const previousTasks = tasks;
+
+    await runWithRollback({
+      applyOptimistic: () => {
+        setTasks((prev) => prev.map((t) => (t._id === task._id ? { ...t, status } : t)));
+      },
+      rollback: () => setTasks(previousTasks),
+      mutation: () => socialMediaApi.updateTask(task._id, { status }),
+      onSuccess: (updated) => {
+        setTasks((prev) => prev.map((t) => (t._id === task._id ? updated : t)));
+      },
+      errorMessage: "Could not move task. Changes were rolled back.",
+    });
+  };
+
+  const createDiscussion = async (e) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+
+    const created = await socialMediaApi.createDiscussion(projectId, {
+      channel: channelId || null,
+      socialPost: selectedPostId || null,
+      message,
+      kind: "discussion",
+    });
+
+    setDiscussions((prev) => [created, ...prev]);
+    setMessage("");
+  };
+
+  const addPostNote = async (e) => {
+    e.preventDefault();
+    if (!selectedPostId || !noteText.trim()) return;
+
+    const updatedPost = await socialMediaApi.addPostNote(selectedPostId, {
+      text: noteText,
+      nodeId: null,
+      important: true,
+    });
+
+    setPosts((prev) => prev.map((p) => (p._id === updatedPost._id ? updatedPost : p)));
+    setNoteText("");
+  };
+
+  const publishNow = async (post) => {
+    const previousPosts = posts;
+
+    await runWithRollback({
+      applyOptimistic: () => {
+        setPosts((prev) =>
+          prev.map((p) =>
+            p._id === post._id ? { ...p, status: "published", publishedAt: new Date().toISOString() } : p
+          )
+        );
+      },
+      rollback: () => setPosts(previousPosts),
+      mutation: () => socialMediaApi.publishPost(post._id),
+      onSuccess: (updated) => {
+        setPosts((prev) => prev.map((p) => (p._id === post._id ? updated : p)));
+      },
+      errorMessage: "Could not publish this post. Changes were rolled back.",
+    });
+  };
+
+  const schedule = async (post, dateValue) => {
+    const previousPosts = posts;
+
+    await runWithRollback({
+      applyOptimistic: () => {
+        setPosts((prev) =>
+          prev.map((p) =>
+            p._id === post._id
+              ? { ...p, status: dateValue ? "scheduled" : p.status, scheduledAt: dateValue || null }
+              : p
+          )
+        );
+      },
+      rollback: () => setPosts(previousPosts),
+      mutation: () => socialMediaApi.schedulePost(post._id, dateValue),
+      onSuccess: (updated) => {
+        setPosts((prev) => prev.map((p) => (p._id === post._id ? updated : p)));
+      },
+      errorMessage: "Could not schedule this post. Changes were rolled back.",
+    });
+  };
 
   return (
-    <div className="social-manager-container flex h-screen bg-gray-50 overflow-hidden font-sans text-gray-900">
-      {/* Sidebar for Social Media Specifics */}
-      <div className="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white">
-              <Megaphone size={20} />
-            </div>
-            <div>
-              <h2 className="font-bold text-gray-900 leading-tight">Ad Manager</h2>
-              <p className="text-xs text-gray-500 font-medium tracking-wide uppercase">Social Media</p>
-            </div>
+    <div className="social-manager-container">
+      <aside className="sm-sidebar">
+        <div className="brand">
+          <Megaphone size={18} />
+          <div>
+            <h2>Social Media Hub</h2>
+            <p>Plan • Discuss • Publish</p>
           </div>
         </div>
-        
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-          <button 
-            onClick={() => setActiveTab('tasks')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${activeTab === 'tasks' ? 'bg-blue-50 text-blue-600 font-semibold shadow-sm' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
-          >
-            <Layout size={18} className={activeTab === 'tasks' ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'} />
-            <span>Campaign Board</span>
-          </button>
-          
-          <button 
-            onClick={() => setActiveTab('calendar')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${activeTab === 'calendar' ? 'bg-blue-50 text-blue-600 font-semibold shadow-sm' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'}`}
-          >
-            <CalendarIcon size={18} className={activeTab === 'calendar' ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-600'} />
-            <span>Content Calendar</span>
-          </button>
 
-          <button 
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition-all duration-200 group"
-          >
-            <BarChart2 size={18} className="text-gray-400 group-hover:text-gray-600" />
-            <span>Performance</span>
-          </button>
-
-          <div className="pt-6 pb-2 px-4">
-             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Platforms</span>
-          </div>
-
-          <button className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-600 hover:bg-gray-50 transition-all">
-             <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-             <span className="text-sm font-medium">Facebook Ads</span>
-          </button>
-          <button className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-600 hover:bg-gray-50 transition-all">
-             <div className="w-2 h-2 rounded-full bg-pink-500"></div>
-             <span className="text-sm font-medium">Instagram</span>
-          </button>
-          <button className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-gray-600 hover:bg-gray-50 transition-all">
-             <div className="w-2 h-2 rounded-full bg-sky-400"></div>
-             <span className="text-sm font-medium">Twitter / X</span>
-          </button>
+        <nav>
+          <button className={tab === "tasks" ? "active" : ""} onClick={() => setTab("tasks")}>Task Manager</button>
+          <button className={tab === "calendar" ? "active" : ""} onClick={() => setTab("calendar")}>Content Calendar</button>
+          <button className={tab === "posts" ? "active" : ""} onClick={() => setTab("posts")}>Post Studio</button>
+          <button className={tab === "discussion" ? "active" : ""} onClick={() => setTab("discussion")}>Group Discussion</button>
         </nav>
 
-        <div className="p-4 mt-auto border-t border-gray-100">
-          <div className="bg-gray-50 rounded-2xl p-4 flex items-center gap-3">
-             <div className="w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm overflow-hidden flex-shrink-0">
-                <img src="https://i.pravatar.cc/150?u=me" alt="User" />
-             </div>
-             <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-gray-900 truncate">Alex Rivera</p>
-                <p className="text-xs text-gray-500 truncate">Social Lead</p>
-             </div>
-             <Settings size={16} className="text-gray-400" />
-          </div>
+        <div className="platforms">
+          <h4>Platforms</h4>
+          <div className="chips">{PLATFORMS.map((p) => <span key={p}>{p}</span>)}</div>
         </div>
-      </div>
+      </aside>
 
-      {/* Main Feature Area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-white shadow-[-8px_0_24px_-12px_rgba(0,0,0,0.05)] z-10">
-        <header className="h-20 border-b border-gray-100 flex items-center justify-between px-8 flex-shrink-0">
+      <main className="sm-main">
+        <header className="sm-header">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Campaign Board</h1>
-            <p className="text-sm text-gray-500 font-medium">Q1 Social Media Advertising Strategy</p>
+            <h1>Social Media Management</h1>
+            <p>Coordinate tasks, discussion, notes, and publishing across your creator team.</p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex -space-x-2">
-               {[1,2,3,4].map(i => (
-                 <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-gray-200 overflow-hidden shadow-sm">
-                    <img src={`https://i.pravatar.cc/100?u=team${i}`} alt="" />
-                 </div>
-               ))}
-               <div className="w-8 h-8 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-500 shadow-sm">+8</div>
-            </div>
-            <div className="h-8 w-px bg-gray-200 mx-2"></div>
-            
-            <button 
-              onClick={() => setDiscussionOpen(!discussionOpen)}
-              className={`p-2.5 rounded-xl transition-all ${discussionOpen ? 'bg-blue-50 text-blue-600' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'}`}
-              title={discussionOpen ? "Close Discussion" : "Open Discussion"}
-            >
-              {discussionOpen ? <PanelRightClose size={20} /> : <MessageSquare size={20} />}
-            </button>
-
-            <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-md shadow-blue-200 active:scale-95">
-              <Share2 size={16} />
-              <span>Share Campaign</span>
-            </button>
-          </div>
+          <button className="refresh-btn" onClick={loadOverview}>Refresh</button>
         </header>
 
-        <main className="flex-1 overflow-hidden flex flex-col">
-          <KanbanView onTaskClick={setSelectedTask} />
-        </main>
-      </div>
+        {loading && <div className="state">Loading workspace…</div>}
+        {error && <div className="error">{error}</div>}
 
-      {/* Slack-like Chat Sidebar for Group Discussion */}
-      {discussionOpen && (
-        <div className="w-[450px] flex flex-col border-l border-gray-200 bg-white transition-all animate-in slide-in-from-right duration-300">
-          <div className="h-20 border-b border-gray-100 flex items-center px-6 flex-shrink-0">
-            <div className="flex items-center gap-3">
-               <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-gray-600">
-                  <MessageSquare size={18} />
-               </div>
-               <h3 className="font-bold text-gray-900">Team Discussion</h3>
-            </div>
-            <div className="ml-auto flex items-center gap-1">
-               <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-green-50 text-green-600 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-                  <span>Active</span>
-               </div>
-            </div>
+        {!loading && (
+          <div className="sm-content">
+            <SocialHeaderStats stats={stats} />
+
+            {tab === "tasks" && (
+              <section className="task-manager-grid">
+                <form className="sm-card" onSubmit={createTask}>
+                  <h3>Create Team Task</h3>
+                  <input
+                    placeholder="Task title"
+                    value={newTask.title}
+                    onChange={(e) => setNewTask((s) => ({ ...s, title: e.target.value }))}
+                  />
+                  <textarea
+                    placeholder="Task description"
+                    value={newTask.description}
+                    onChange={(e) => setNewTask((s) => ({ ...s, description: e.target.value }))}
+                  />
+                  <select
+                    value={newTask.status}
+                    onChange={(e) => setNewTask((s) => ({ ...s, status: e.target.value }))}
+                  >
+                    {TASK_COLUMNS.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                  <button type="submit"><Plus size={14} /> Add Task</button>
+                </form>
+
+                <div className="kanban-columns">
+                  {TASK_COLUMNS.map((status) => (
+                    <div key={status} className="kanban-col">
+                      <h4>{status.replace("_", " ")}</h4>
+                      {(tasksByStatus[status] || []).map((task) => (
+                        <article key={task._id} className="task-card">
+                          <strong>{task.title}</strong>
+                          <p>{task.description}</p>
+                          <div className="task-actions">
+                            {TASK_COLUMNS.filter((s) => s !== task.status).slice(0, 2).map((next) => (
+                              <button key={next} onClick={() => moveTask(task, next)}>{next}</button>
+                            ))}
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {tab === "calendar" && (
+              <section className="sm-card">
+                <h3><CalendarIcon size={16} /> Content Calendar</h3>
+                {scheduledPosts.length === 0 ? (
+                  <p className="empty">No scheduled posts yet.</p>
+                ) : (
+                  <div className="calendar-list">
+                    {scheduledPosts.map((p) => (
+                      <div className="calendar-item" key={p._id}>
+                        <div>
+                          <strong>{p.title}</strong>
+                          <p>{new Date(p.scheduledAt).toLocaleString()}</p>
+                        </div>
+                        <div className="platform-badges">
+                          {(p.platforms || []).map((pl) => <span key={pl}>{pl}</span>)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            )}
+
+            {tab === "posts" && (
+              <section className="posts-layout">
+                <form className="sm-card" onSubmit={createPost}>
+                  <h3>Post Studio</h3>
+                  <input
+                    placeholder="Post title"
+                    value={newPost.title}
+                    onChange={(e) => setNewPost((s) => ({ ...s, title: e.target.value }))}
+                  />
+                  <textarea
+                    placeholder="Short caption"
+                    value={newPost.caption}
+                    onChange={(e) => setNewPost((s) => ({ ...s, caption: e.target.value }))}
+                  />
+                  <SocialPostEditor
+                    value={newPost.contentHtml}
+                    onChange={(html) => setNewPost((s) => ({ ...s, contentHtml: html }))}
+                    media={postMedia}
+                    setMedia={setPostMedia}
+                  />
+                  <select
+                    value={newPost.contentType}
+                    onChange={(e) => setNewPost((s) => ({ ...s, contentType: e.target.value }))}
+                  >
+                    <option value="text">Text</option>
+                    <option value="image">Image</option>
+                    <option value="video">Video</option>
+                    <option value="carousel">Carousel</option>
+                    <option value="blog">Blog</option>
+                  </select>
+                  <input
+                    type="datetime-local"
+                    value={newPost.scheduledAt}
+                    onChange={(e) => setNewPost((s) => ({ ...s, scheduledAt: e.target.value }))}
+                  />
+                  <div className="chips select-chips">
+                    {PLATFORMS.map((p) => (
+                      <button
+                        type="button"
+                        key={p}
+                        className={newPost.platforms.includes(p) ? "active" : ""}
+                        onClick={() =>
+                          setNewPost((s) => ({
+                            ...s,
+                            platforms: s.platforms.includes(p)
+                              ? s.platforms.filter((x) => x !== p)
+                              : [...s.platforms, p],
+                          }))
+                        }
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+                  <button type="submit"><Plus size={14} /> Create Post</button>
+                </form>
+
+                <div className="sm-card post-list">
+                  <h3>Content Pipeline</h3>
+                  {posts.length === 0 ? (
+                    <p className="empty">No posts yet.</p>
+                  ) : (
+                    posts.map((p) => (
+                      <article
+                        key={p._id}
+                        className={`post-card ${selectedPostId === p._id ? "active" : ""}`}
+                        onClick={() => setSelectedPostId(p._id)}
+                      >
+                        <div className="row">
+                          <strong>{p.title}</strong>
+                          <span className={`status ${p.status}`}>{p.status}</span>
+                        </div>
+                        <p>{p.caption || "No caption"}</p>
+                        {!!p.contentHtml && <small className="content-rich-label">Rich content</small>}
+                        <div className="row">
+                          <div className="platform-badges">
+                            {(p.platforms || []).map((pl) => <span key={pl}>{pl}</span>)}
+                            {p.media?.length ? <span>{p.media.length} media</span> : null}
+                          </div>
+                          <div className="actions">
+                            <button onClick={(e) => { e.stopPropagation(); publishNow(p); }}>
+                              <CheckCircle2 size={13} /> Publish
+                            </button>
+                            <input
+                              type="datetime-local"
+                              onClick={(e) => e.stopPropagation()}
+                              onChange={(e) => schedule(p, e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </article>
+                    ))
+                  )}
+                </div>
+
+                <form className="sm-card" onSubmit={addPostNote}>
+                  <h3>Canvas Notes / Context</h3>
+                  <select value={selectedPostId} onChange={(e) => setSelectedPostId(e.target.value)}>
+                    <option value="">Select post</option>
+                    {posts.map((p) => (
+                      <option key={p._id} value={p._id}>{p.title}</option>
+                    ))}
+                  </select>
+                  <textarea
+                    placeholder="Important context for image/video content, CTA, brand voice, references..."
+                    value={noteText}
+                    onChange={(e) => setNoteText(e.target.value)}
+                  />
+                  <button type="submit">Add Important Note</button>
+
+                  {selectedPost?.notes?.length ? (
+                    <div className="note-list">
+                      {selectedPost.notes.slice(0, 8).map((n) => (
+                        <div key={n._id} className="note-item">
+                          <p>{n.text}</p>
+                          <small>{n.author?.name || "Member"}</small>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                </form>
+              </section>
+            )}
+
+            {tab === "discussion" && (
+              <section className="discussion-layout">
+                <form className="sm-card" onSubmit={createDiscussion}>
+                  <h3><MessageSquare size={16} /> Group Discussion</h3>
+                  <select value={selectedPostId} onChange={(e) => setSelectedPostId(e.target.value)}>
+                    <option value="">General thread</option>
+                    {posts.map((p) => (
+                      <option key={p._id} value={p._id}>{p.title}</option>
+                    ))}
+                  </select>
+                  <textarea
+                    placeholder="Discuss copy ideas, hooks, target audience, publishing strategy..."
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                  />
+                  <button type="submit"><Send size={14} /> Send</button>
+                </form>
+
+                <div className="sm-card discussion-stream">
+                  <h3>Team Chat Stream</h3>
+                  {discussions.length === 0 ? (
+                    <p className="empty">No discussion yet. Start the planning thread.</p>
+                  ) : (
+                    discussions.map((d) => (
+                      <article key={d._id} className="discussion-item">
+                        <div className="row">
+                          <strong>{d.author?.name || "Team member"}</strong>
+                          <span>{new Date(d.createdAt).toLocaleString()}</span>
+                        </div>
+                        <p>{d.message}</p>
+                        {d.socialPost?.title && <small>Post: {d.socialPost.title}</small>}
+                      </article>
+                    ))
+                  )}
+                </div>
+              </section>
+            )}
+
+            <FutureLabPanel />
           </div>
-
-          <div className="flex-1 flex flex-col overflow-hidden relative social-chat-section">
-             <MessageList openThread={setThreadMsg} />
-             <div className="px-6 py-2">
-               <TypingIndicator />
-             </div>
-             <div className="p-6 border-t border-gray-100 bg-white">
-               <MessageInput />
-             </div>
-          </div>
-
-          {threadMsg && (
-            <div className="absolute inset-y-0 right-0 w-full bg-white z-20 border-l border-gray-200 flex flex-col shadow-2xl">
-               <ThreadPanel message={threadMsg} onClose={() => setThreadMsg(null)} />
-            </div>
-          )}
-        </div>
-      )}
+        )}
+      </main>
     </div>
   );
-};
-
-export default SocialMediaManager;
+}

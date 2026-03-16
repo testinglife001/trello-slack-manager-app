@@ -71,11 +71,27 @@ export default function CanvasChannelList() {
                    </NavLink>
 
                    <NavLink 
-                     to={`/projects/${projectId}/activity-canvas/${c._id}`}
+                     to={`/projects/${projectId}/canvas/${c._id}/activity`}
                      className={({isActive}) => `flex items-center gap-2 py-1.5 text-[11px] font-black uppercase tracking-wider transition-all ${isActive ? "text-blue-600" : "text-gray-400 hover:text-gray-600"}`}
                    >
                       <Activity size={12} />
-                      <span>Activity</span>
+                      <span>Project Activity</span>
+                   </NavLink>
+
+                   <NavLink 
+                     to={`/canvas/${projectId}/${c._id}`}
+                     className={({isActive}) => `flex items-center gap-2 py-1.5 text-[11px] font-black uppercase tracking-wider transition-all ${isActive ? "text-blue-600" : "text-gray-400 hover:text-gray-600"}`}
+                   >
+                      <Activity size={12} />
+                      <span>Canvas Wrapper</span>
+                   </NavLink>
+
+                   <NavLink 
+                     to={`/${projectId}/${c._id}/canvas`}
+                     className={({isActive}) => `flex items-center gap-2 py-1.5 text-[11px] font-black uppercase tracking-wider transition-all ${isActive ? "text-blue-600" : "text-gray-400 hover:text-gray-600"}`}
+                   >
+                      <Activity size={12} />
+                      <span>Activity Dashboard</span>
                    </NavLink>
 
                    <NavLink 

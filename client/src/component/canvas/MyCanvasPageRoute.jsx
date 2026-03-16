@@ -5,7 +5,7 @@ import { CanvasProvider } from "../../context/CanvasContext";
 import { ChannelProvider } from "../../context/ChannelContext";
 import { useChannel } from "../../context/ChannelContext";
 import MyCanvasPage from "./MyCanvasPage";
-import MyCanvasPageEx from "./MyCanvasPageEx";
+import CanvasRouteShell from "./CanvasRouteShell";
 
 // Inner component so it can access ChannelContext after the provider mounts
 function MyCanvasPageInner({ channelId, projectId }) {
@@ -18,10 +18,9 @@ function MyCanvasPageInner({ channelId, projectId }) {
   }, [channelId]);
 
   return (
-    <MyCanvasPage
-       projectId={projectId}
-      channelId={channelId}
-    />
+    <CanvasRouteShell title="My Canvas" subtitle="Advanced collaborative board workspace">
+      <MyCanvasPage projectId={projectId} channelId={channelId} />
+    </CanvasRouteShell>
   );
 }
 
@@ -83,4 +82,3 @@ export default function MyCanvasPageRoute() {
   );
 }
 */
-

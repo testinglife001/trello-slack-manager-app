@@ -24,6 +24,13 @@
   position: relative;
 }
 
+.project-main-content {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
 /* ================= CANVAS ================= */
 .layout-canvas {
   width: 520px;
@@ -34,6 +41,87 @@
   flex-direction: column;
   box-shadow: -10px 0 30px rgba(0,0,0,0.02);
   z-index: 10;
+}
+
+.layout-activity-sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  border-left: 1px solid #f3f4f6;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.activity-sidebar-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: #ffffff;
+  border-bottom: 1px solid #f3f4f6;
+  padding: 12px 14px;
+}
+
+.activity-sidebar-header .title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.activity-sidebar-list {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.activity-entry {
+  background: #f9fafb;
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.activity-entry .line1 {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  font-size: 12px;
+  color: #111827;
+}
+
+.activity-entry .line1 span {
+  color: #4b5563;
+}
+
+.activity-entry .meta {
+  font-size: 12px;
+  color: #2563eb;
+  margin-top: 4px;
+}
+
+.activity-entry .time {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 6px;
+}
+
+.activity-sidebar-list .empty {
+  font-size: 12px;
+  color: #9ca3af;
+  text-align: center;
+  padding: 20px 0;
+}
+
+@media (max-width: 1400px) {
+  .layout-activity-sidebar {
+    display: none;
+  }
 }
 
 /* Custom Scrollbar for the whole app */
