@@ -1,14 +1,17 @@
-// 1️⃣ ActivityFeed.jsx (Rewritten Controlled Component)
-export default function ActivityFeed({ activities }) {
+export default function ActivityFeed({ activities = [] }) {
+  if (!activities.length) {
+    return <p className="empty-state">No activity available yet.</p>;
+  }
+
   return (
     <div className="activity-feed">
-      {activities.map(a => (
+      {activities.map((a) => (
         <div key={a._id} className="activity-item">
-          <strong>{a.actor?.name}</strong>{" "}
-          {a.action} <em>{a.entityType}</em>
+          <strong>{a.actor?.name || "Someone"}</strong>{" "}
+          {a.action || a.type || "updated"} {a.entityType ? <em>{a.entityType}</em> : null}
           {a.meta?.title && `: ${a.meta.title}`}
           <div className="activity-time">
-            {new Date(a.createdAt).toLocaleString()}
+            {a.createdAt ? new Date(a.createdAt).toLocaleString() : ""}
           </div>
         </div>
       ))}

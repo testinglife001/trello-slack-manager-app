@@ -54,7 +54,7 @@ import RootLayout from "../layouts/RootLayout";
 import ProjectProvider from "../context/ProjectContext";
 import TaskDetailsModal from "../pages/tasks/TaskDetailsModal";
 import NotificationToasts from "../components/notifications/NotificationToasts";
-import CanvasActivityDashboard from "../pages/activity/CanvasActivityDashboard";
+import CanvasActivityDashboardRoute from "../pages/activity/CanvasActivityDashboardRoute";
 
 function PublicOnly({ children }) {
   const { user } = useAuth();
@@ -143,7 +143,7 @@ export default function AppRouter() {
         {/* Project activity */}
         <Route path="/projects/:projectId/canvas/:channelId/activity" element={<ProjectActivityPage />} />
         <Route path="/canvas/:projectId/:channelId" element={<CanvasDashboardWrapper />} />
-        <Route path="/:projectId/:channelId/canvas" element={<CanvasActivityDashboard />} />
+        <Route path="/:projectId/:channelId/canvas" element={<CanvasActivityDashboardRoute />} />
         
       
         <Route

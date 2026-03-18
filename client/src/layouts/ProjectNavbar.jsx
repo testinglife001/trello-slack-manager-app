@@ -2,8 +2,9 @@
 import { useState } from "react";
 import CreateBoardModal from "../modules/board/CreateBoardModal";
 import CreateChannelModal from "../modules/chat/CreateChannelModal";
-import { Menu, Plus, Sidebar, Sparkles, Layout, Hash } from "lucide-react";
+import { Menu, Plus, Sidebar, Sparkles, Layout } from "lucide-react";
 import { useProject } from "../context/ProjectContext";
+import NotificationBell from "../components/notifications/NotificationBell";
 
 export default function ProjectNavbar({
   toggleSidebar,
@@ -33,6 +34,8 @@ export default function ProjectNavbar({
       </div>
 
       <div className="flex items-center gap-3">
+        <NotificationBell />
+
         {showCanvasButton && (
           <button 
             onClick={toggleCanvas}

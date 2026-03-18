@@ -6,6 +6,7 @@ import Sidebar from "../modules/sidebar/Sidebar";
 import { useProject } from "../context/ProjectContext";
 import ProjectNavbar from "./ProjectNavbar";
 import CanvasBoard from "../modules/canvas/CanvasBoard";
+import ProjectActivitySidebar from "../modules/activity/ProjectActivitySidebar";
 import "./projectlayout.css";
 
 export default function ProjectLayout() {
@@ -45,13 +46,17 @@ export default function ProjectLayout() {
         {!sidebarCollapsed && <Sidebar />}
 
         <div className="project-workspace">
-          <Outlet />
+          <div className="project-main-content">
+            <Outlet />
+          </div>
 
           {isChannel && canvasOpen && (
             <div className="layout-canvas">
               <CanvasBoard />
             </div>
           )}
+
+          <ProjectActivitySidebar />
         </div>
       </div>
     </div>

@@ -1,16 +1,5 @@
-// pages/ProjectActivityPage.jsx
-import { useParams } from "react-router-dom";
-import CanvasDashboardActivity from "./CanvasDashboardActivity";
+import ActivityRouteRenderer from "./ActivityRouteRenderer";
 
 export default function ProjectActivityPage() {
-  const { projectId, channelId } = useParams();
-  const userId = JSON.parse(localStorage.getItem("user"))?._id;
-
-  return (
-    <CanvasDashboardActivity
-      projectId={projectId}
-      channelId={channelId}
-      userId={userId}
-    />
-  );
+  return <ActivityRouteRenderer />;
 }

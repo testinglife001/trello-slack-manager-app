@@ -32,6 +32,7 @@ app.use("/api/canvas-notifications", require("./routes/canvasnotification"));
 
 // app.use("/api/mycanvas", require("./routes/mycanvas.routes"));
 app.use("/api/mycanvas", require("./routes/mycanvas"));
+app.use("/api/social-media", require("./routes/socialMedia"));
 
 
 

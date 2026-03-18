@@ -4,7 +4,8 @@ import { useParams } from "react-router-dom";
 import { CanvasProvider } from "../../context/CanvasContext";
 import { ChannelProvider } from "../../context/ChannelContext";
 import { useChannel } from "../../context/ChannelContext";
-import MyCanvasPageExI from "./MyCanvasPageExI";
+import CanvasBoards from "../../modules/canvas/CanvasBoards";
+import CanvasRouteShell from "./CanvasRouteShell";
 
 
 // Inner component so it can access ChannelContext after the provider mounts
@@ -18,10 +19,9 @@ function MyCanvasPageExInner({ channelId, projectId }) {
   }, [channelId]);
 
   return (
-    <MyCanvasPageExI
-       projectId={projectId}
-      channelId={channelId}
-    />
+    <CanvasRouteShell title="My Canvas EX-I" subtitle="Immersive interaction mode for creators">
+      <CanvasBoards key={`${projectId}:${channelId}:exi`} />
+    </CanvasRouteShell>
   );
 }
 
@@ -41,4 +41,3 @@ export default function MyCanvasPageExIRoute() {
     </ChannelProvider>
   );
 }
-
